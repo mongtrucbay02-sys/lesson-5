@@ -1,0 +1,20 @@
+﻿@{
+    ViewData["Title"] = "Kiểm tra cuối tuần";
+
+    var today = DateTime.Now;
+    var isWeekend = today.DayOfWeek == DayOfWeek.Saturday
+                 || today.DayOfWeek == DayOfWeek.Sunday;
+}
+
+<div class="text-center mt-5">
+    <h2>Hôm nay: @today.ToString("dddd, dd/MM/yyyy")</h2>
+
+    @if (isWeekend)
+    {
+        <h1 class="text-success">Have nice weekend</h1>
+    }
+    else
+    {
+        <p class="text-muted">Hôm nay không phải cuối tuần.</p>
+    }
+</div>
