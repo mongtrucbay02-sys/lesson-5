@@ -1,19 +1,42 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MyApp.Models;
+using Microsoft.Data.SqlClient;
+using lesson5.Models;
 
-namespace MyApp.Controllers
+namespace lesson5.Controllers
 {
     public class ProductController : Controller
     {
+        private readonly IConfiguration _config;
+
+        public ProductController(IConfiguration config)
+        {
+            _config = config;
+        }
+
         public IActionResult Index()
         {
-            var products = new List<Product>
+            var products = new List<Product>();
+            string connStr = _config.GetConnectionString("DefaultConnection")!;
+
+            using (var conn = new SqlConnection(connStr))
             {
-                new Product { Id = 1, Name = "Laptop Dell",     Price = 15000000 },
-                new Product { Id = 2, Name = "Chuột Logitech",  Price = 350000 },
-                new Product { Id = 3, Name = "Bàn phím cơ",     Price = 1200000 },
-                new Product { Id = 4, Name = "Màn hình LG 24\"", Price = 3500000 }
-            };
+                conn.Open();
+                string sql = "SELECT Id, Name, Price FROM Product";
+
+                using (var cmd = new SqlCommand(sql, conn))
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        products.Add(new Product
+                        {
+                            Id = reader.GetInt32(0),
+                            Name = reader.GetString(1),
+                            Price = reader.GetDecimal(2)
+                        });
+                    }
+                }
+            }
 
             return View(products);
         }
